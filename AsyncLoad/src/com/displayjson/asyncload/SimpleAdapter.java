@@ -18,12 +18,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
-public class SimpleAdapter extends BaseAdapter {	
+public class SimpleAdapter extends BaseAdapter {
     private Activity mActivity;
     private List<JsonRowItem> mList;
     private ImageLoader mImageLoader; 
     private static LayoutInflater mInflater = null;
-    private Map<Integer, View> mViewMap = new HashMap<Integer, View>();
+    private Map<Integer, View> mViewMap = new HashMap<Integer, View>(); //???
 
     public SimpleAdapter(Activity activity, List<JsonRowItem> list) {
     	mActivity = activity;

@@ -34,7 +34,7 @@ public class FileCache {
 	/**
 	 * get the image file with encode name
 	 */
-    public File getFile(String url){
+    public File getFile(String url) {
     	String file_name;
     	try {
     		file_name = URLEncoder.encode(url, Constants.ENCODE_CHARSET);
@@ -47,7 +47,7 @@ public class FileCache {
     }
     
 	/**
-	 * clear all the files stored
+	 * clear all the image stored
 	 */
     public void clear() {
     	try {

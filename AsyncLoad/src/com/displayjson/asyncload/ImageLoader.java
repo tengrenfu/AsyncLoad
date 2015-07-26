@@ -55,6 +55,9 @@ public class ImageLoader {
      * a thread to get, decode and display 
      */
     public void displayImageOnView(String url, ImageView imageView) {
+    	if (url == null || imageView == null) {
+    		return;
+    	}
         mImageViews.put(imageView, url);
         Bitmap bitmap = mMemoryCache.getImage(url);
         if (bitmap != null) {

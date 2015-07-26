@@ -20,7 +20,7 @@ public class ImageMemoryCache {
     private Map<String, Bitmap> mCache;
 
     public ImageMemoryCache() {
-    	long size = Runtime.getRuntime().maxMemory() / 4;  // get 25% of JVM heap size
+    	long size = Runtime.getRuntime().maxMemory() / Constants.JVM_MEMORY_DIV;  // get 25% of JVM heap size
     	if (size > maxSize) {
     		setMaxSize(size);
     	}
@@ -36,6 +36,9 @@ public class ImageMemoryCache {
 	 * get the image from mCache by url
 	 */
     public Bitmap getImage(String id) {
+    	if (id == null) {
+    		return null;
+    	}
         try {        	
             if (!mCache.containsKey(id)) {
                 return null;
@@ -82,6 +85,9 @@ public class ImageMemoryCache {
 	 * by calling checkLimit() 
 	 */
     public void putImage(String id, Bitmap bitmap) {
+    	if (id == null || bitmap == null) {
+    		return;
+    	}
         try {
             if (mCache.containsKey(id)) {
             	currentSize -= getImageSize(mCache.get(id));
