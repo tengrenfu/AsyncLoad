@@ -23,8 +23,8 @@ public class SimpleAdapter extends BaseAdapter {
     private static LayoutInflater mInflater = null;
 
     public SimpleAdapter(Activity activity, List<JsonRowItem> list) {
-    	mActivity = activity;
     	mList = list;
+    	mActivity = activity;
     	mInflater = (LayoutInflater)mActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     	mImageLoader = new ImageLoader(mActivity.getApplicationContext());
     }
@@ -35,13 +35,13 @@ public class SimpleAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public Object getItem(int arg0) {
-        return arg0;
+	public Object getItem(int position) {
+        return mList.get(position);
 	}
 
 	@Override
-	public long getItemId(int arg0) {
-        return arg0;
+	public long getItemId(int position) {
+        return position;
 	}
 
 	/**
@@ -85,6 +85,13 @@ public class SimpleAdapter extends BaseAdapter {
         
         return convertView;
 	}
+
+	/**
+	 * add more items to the list 
+	 */
+    public void addRowItems(JsonRowItem item) {
+        mList.add(item);
+    }
 
 	/**
 	 * clear all the images' cache

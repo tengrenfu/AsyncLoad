@@ -21,6 +21,8 @@ public final class Constants {
 	public static final String  CACHE_DIR = "ImageCache";
 	public static final String  ENCODE_CHARSET = "UTF-8";
 	
+	public static final int  MAX_ONCE_LOAD = 10;
+	public static final int  DELAY = 1000;
 	public static final int  JSON_CONNECT_TIMEOUT = 3000;
 	public static final int  JSON_READ_TIME = 3000;
 	public static final int  HTTP_RESPONSE_OK = 200;    //do NOT change this value

@@ -11,14 +11,19 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+import java.util.ArrayList;
 
 import android.os.Bundle;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.AbsListView;  
+import android.widget.AbsListView.OnScrollListener;  
 import android.view.View;
 import android.widget.Toast;
 
@@ -27,17 +32,24 @@ import com.google.gson.Gson;
 
 public class AsyncLoadActivity extends Activity {
     private Button mButton;
-    private ListView mList;
+    private ListView mListView;
     private TextView mTitle;
+    private int mVisibleLastIndex;
     private SimpleAdapter mAdapter;
-
+    private JsonBody mJsonBody;
+    private Handler mHandler = new Handler();  
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_async_load);
 		
+		mVisibleLastIndex = 0;
+    	mTitle = (TextView)findViewById(R.id.title);
 		mButton = (Button)findViewById(R.id.reload);
 		mButton.setOnClickListener(listener);
+		mListView = (ListView)findViewById(R.id.list);
+		mListView.setOnScrollListener(new scrollListener());
 		/* 
 		 * start a task to request json data 
 		 * and display the contents on the list view
@@ -53,9 +65,86 @@ public class AsyncLoadActivity extends Activity {
     Button.OnClickListener listener = new Button.OnClickListener() {     
         public void onClick(View v) {
             new requestTask().execute();
-        }    
+        }
     }; 
 
+    private class scrollListener implements OnScrollListener {
+    	@Override  
+    	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+    		mVisibleLastIndex = firstVisibleItem + visibleItemCount;
+    	}  
+  
+    	/** 
+    	 * load the contents on the list view 
+    	 * when on idle state, here to implement
+    	 * to load on demand
+    	 */ 
+    	@Override  
+    	public void onScrollStateChanged(AbsListView view, int scrollState) {  
+    		int itemsLastIndex = mAdapter.getCount() - 1;
+    		if (scrollState == OnScrollListener.SCROLL_STATE_IDLE 
+    				&& mVisibleLastIndex >= itemsLastIndex) {
+    			if (mAdapter.getCount() < mJsonBody.getRows().size()) {
+    				loadMore();
+    			}
+    		}
+    	}
+    }
+
+	/** 
+	 * run a thread to add more items to
+	 * adapter then notify state changed 
+	 */ 
+    private void loadMore() {
+        mHandler.postDelayed(new Runnable() {
+            @Override  
+            public void run() {
+                loadData();  
+                mAdapter.notifyDataSetChanged();
+            }  
+        }, Constants.DELAY);  
+    }  
+      
+	/** 
+	 * add more items to adapter 
+	 */ 
+    private void loadData() {
+        int end;
+        int count = mAdapter.getCount();
+        if (count >= mJsonBody.getRows().size()) {
+        	return;
+        }
+        end = count + Constants.MAX_ONCE_LOAD;
+        if (end > mJsonBody.getRows().size()) {
+        	end = mJsonBody.getRows().size();
+        }
+        for (int i = count; i < end; i++) {
+        	mAdapter.addRowItems(mJsonBody.getRows().get(i));
+        }  
+        
+    }  
+    
+	/** 
+	 * get a part of json row item from list
+	 */ 
+    private List<JsonRowItem> getRangeRowItem(int start, int end) {
+    	if (mJsonBody == null) {
+    		return null;
+    	}
+    	int size = mJsonBody.getRows().size();
+    	if (start > size || start < 0 || end < start) {
+    		return null;
+    	}
+    	if (end > size) {
+    		end = size;
+    	}
+    	List<JsonRowItem> list = new ArrayList<JsonRowItem>();
+    	for (int i = start; i < end; i++) {
+    	    list.add(mJsonBody.getRows().get(i));
+    	}
+    	return list;
+    }
+    
 	/** 
 	 * clear all the cache and free the resource used by list view
 	 */ 
@@ -64,7 +153,7 @@ public class AsyncLoadActivity extends Activity {
     	if (mAdapter != null) {
     		mAdapter.clearCache();
     	}
-        mList.setAdapter(null);
+    	mListView.setAdapter(null);
         super.onDestroy();
     }
 
@@ -112,7 +201,6 @@ public class AsyncLoadActivity extends Activity {
 	 * and display them on list view
 	 */ 
     private class requestTask extends AsyncTask<Object, Void, Void> {
-        JsonBody jsonData;
         ProgressDialog progressDialog;
 
         @Override
@@ -135,7 +223,7 @@ public class AsyncLoadActivity extends Activity {
         
         @Override
         protected Void doInBackground(Object... arg0) {
-            jsonData = getJsonFromUrl(Constants.JSON_URL);
+        	mJsonBody = getJsonFromUrl(Constants.JSON_URL);
             return null;
         }
 
@@ -145,22 +233,20 @@ public class AsyncLoadActivity extends Activity {
         	 *  finish loading, dismiss the dialog
         	 *  enable the 'Reload' button
         	 */
-            if (jsonData != null) {
+            if (mJsonBody != null) {
             	/*
             	 *  parse successfully
             	 */
-            	mTitle = (TextView)findViewById(R.id.title);
-            	if (jsonData.getTitle() != null) {
-            		mTitle.setText(jsonData.getTitle());
+            	if (mJsonBody.getTitle() != null) {
+            		mTitle.setText(mJsonBody.getTitle());
             	}
-            	if (jsonData.getRows() != null) {
+            	if (mJsonBody.getRows() != null) {
             		/*
             		 *  set json data to the adapter
             		 *  then set the adapter to the list view
             		 */
-                	mList = (ListView)findViewById(R.id.list);
-                	mAdapter = new SimpleAdapter(AsyncLoadActivity.this, jsonData.getRows());
-                	mList.setAdapter(mAdapter);
+                	mAdapter = new SimpleAdapter(AsyncLoadActivity.this, getRangeRowItem(0, Constants.MAX_ONCE_LOAD));
+                	mListView.setAdapter(mAdapter);
             	}
             } else {
             	Toast.makeText(AsyncLoadActivity.this, 
