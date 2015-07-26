@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="title_backround">#0099FF</color>
+	<color name="title_color">#333333</color>
+	<color name="row_title_color">#3399cc</color>
+    <color name="button_background_startcolor">#717a97</color>
+    <color name="button_background_endcolor">#223158</color>
+    <color name="row_background_startcolor">#ffffff</color>
+    <color name="row_background_endcolor">#EDEDED</color>
+    		
+</resources>
