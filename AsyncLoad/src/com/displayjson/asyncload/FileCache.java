@@ -32,7 +32,7 @@ public class FileCache {
     }
     
 	/**
-	 * get the image file with encode name
+	 * get the image file with URL in SD card
 	 */
     public File getFile(String url) {
     	String file_name;
@@ -41,13 +41,13 @@ public class FileCache {
     	} catch (UnsupportedEncodingException e) {
     		file_name = String.valueOf(url.hashCode());    		
     	}
-        File file = new File(mCacheDir, file_name);  //???
+        File file = new File(mCacheDir, file_name);
         return file;
         
     }
     
 	/**
-	 * clear all the image stored
+	 * clear all the images stored in SD card
 	 */
     public void clear() {
     	try {

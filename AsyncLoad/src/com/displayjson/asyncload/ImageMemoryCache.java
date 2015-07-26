@@ -20,12 +20,15 @@ public class ImageMemoryCache {
     private Map<String, Bitmap> mCache;
 
     public ImageMemoryCache() {
-    	long size = Runtime.getRuntime().maxMemory() / Constants.JVM_MEMORY_DIV;  // get 25% of JVM heap size
+    	/*
+    	 *  25% of JVM heap size
+    	 */
+    	long size = Runtime.getRuntime().maxMemory() / Constants.JVM_MEMORY_DIV;
     	if (size > maxSize) {
     		setMaxSize(size);
     	}
         mCache = Collections.synchronizedMap(
-                new LinkedHashMap<String, Bitmap>(10, 1.5f, true)); //???
+                new LinkedHashMap<String, Bitmap>(10, 1.5f, true));
     }
     
     private void setMaxSize(long max){
@@ -33,7 +36,7 @@ public class ImageMemoryCache {
     }
 
 	/**
-	 * get the image from mCache by url
+	 * get the image from mCache by URL
 	 */
     public Bitmap getImage(String id) {
     	if (id == null) {
@@ -61,9 +64,8 @@ public class ImageMemoryCache {
     }
 
 	/**
-	 * make sure do not larger than maxSize
-	 * if happened, delete the first image
-	 * in the cache in every loop
+	 * make sure not larger than maxSize
+	 * if happened, delete the oldest image stored in the mCache
 	 */
     private void checkLimit() {
         if (currentSize > maxSize) {
@@ -101,7 +103,7 @@ public class ImageMemoryCache {
     }
     
 	/**
-	 * clear all the image in mCache 
+	 * clear all the images in memory
 	 */
     public void clear() {
         try {

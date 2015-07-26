@@ -5,8 +5,6 @@
 package com.displayjson.asyncload;
 
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,7 +21,6 @@ public class SimpleAdapter extends BaseAdapter {
     private List<JsonRowItem> mList;
     private ImageLoader mImageLoader; 
     private static LayoutInflater mInflater = null;
-    private Map<Integer, View> mViewMap = new HashMap<Integer, View>(); //???
 
     public SimpleAdapter(Activity activity, List<JsonRowItem> list) {
     	mActivity = activity;
@@ -52,47 +49,45 @@ public class SimpleAdapter extends BaseAdapter {
 	 * this method will be called
 	 */
 	@Override
-	public View getView(int arg0, View arg1, ViewGroup arg2) {
+	public View getView(int position, View convertView, ViewGroup parent) {
     	ViewHolder holder = null;
-    	View rowView = mViewMap.get(arg0);
+    	JsonRowItem item = mList.get(position);
     	
-    	if (rowView == null) {
-        	JsonRowItem item = mList.get(arg0);
-        	rowView = mInflater.inflate(R.layout.row_item, null);
+    	if (convertView == null) {
+        	convertView = mInflater.inflate(R.layout.row_item, null);
             holder = new ViewHolder();
-            holder.rowTitle = (TextView)rowView.findViewById(R.id.row_title);
-            holder.descritpion = (TextView)rowView.findViewById(R.id.description);
-            holder.image = (ImageView)rowView.findViewById(R.id.image);
-            rowView.setTag(holder);
+            holder.rowTitle = (TextView)convertView.findViewById(R.id.row_title);
+            holder.descritpion = (TextView)convertView.findViewById(R.id.description);
+            holder.image = (ImageView)convertView.findViewById(R.id.image);
+            convertView.setTag(holder);
             
-            if (item.getTitle() != null) {
-            	holder.rowTitle.setText(item.getTitle());
-            }
-            if (item.getDescription() != null) {
-            	holder.descritpion.setText(item.getDescription());
-            }
-            if (item.getImageHref() != null) {
-            	/*
-            	 * set URL as tag to the image view, later image loader finish
-            	 * downloading the image and display the image on the view according
-            	 * to the tag, it avoid to display the image to another row 
-            	 * and here image loader download and display the image in other
-            	 * threads to keep the UI not blocking
-            	 */
-            	holder.image.setTag(item.getImageHref());
-                mImageLoader.displayImageOnView(item.getImageHref(), holder.image);
-            }
-            
-            mViewMap.put(arg0, rowView);
         } else {
-        	holder = (ViewHolder)rowView.getTag();
+        	holder = (ViewHolder)convertView.getTag();
         }
 
-        return rowView;
+        if (item.getTitle() != null) {
+        	holder.rowTitle.setText(item.getTitle());
+        }
+        if (item.getDescription() != null) {
+        	holder.descritpion.setText(item.getDescription());
+        }
+        if (item.getImageHref() != null) {
+        	/*
+        	 * set URL as tag to the image view, later image loader finish
+        	 * downloading the image and display it on the list view according
+        	 * to the tag, thus avoid to display the image on another row 
+        	 * and here the imageloader download and display the image in another
+        	 * thread to keep the UI not blocking
+        	 */
+        	holder.image.setTag(item.getImageHref());
+            mImageLoader.displayImageOnView(item.getImageHref(), holder.image);
+        }
+        
+        return convertView;
 	}
 
 	/**
-	 * clear all the image cache
+	 * clear all the images' cache
 	 * whatever in memory or in SD card 
 	 */
     public void clearCache() {

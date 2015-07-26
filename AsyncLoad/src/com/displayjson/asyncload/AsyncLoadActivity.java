@@ -36,20 +36,19 @@ public class AsyncLoadActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_async_load);
 		
-		mButton = (Button)findViewById(R.id.refresh);
+		mButton = (Button)findViewById(R.id.reload);
 		mButton.setOnClickListener(listener);
 		/* 
 		 * start a task to request json data 
-		 * and load the content into listview
+		 * and display the contents on the list view
 		 */ 
         new requestTask().execute();
 	}
 
 	/* 
-	 * the click listen of the refresh button  
-	 * start a task to request json data 
-	 * and load the content into listview
-	 * when it's clicked
+	 * the click listener for 'Reload' button,   
+	 * to start a task to request json data and display 
+	 * the contents on the list view when it's clicked
 	 */ 
     Button.OnClickListener listener = new Button.OnClickListener() {     
         public void onClick(View v) {
@@ -58,8 +57,7 @@ public class AsyncLoadActivity extends Activity {
     }; 
 
 	/** 
-	 * here we'd clear the cache
-	 * and free the resource for listview
+	 * clear all the cache and free the resource used by list view
 	 */ 
     @Override
     public void onDestroy() {
@@ -72,9 +70,9 @@ public class AsyncLoadActivity extends Activity {
 
 
 	/** 
-	 * get json data with http request
-	 * then parse the data with gson
-	 * called by the task
+	 * get json data with http request from server
+	 * then parse the response stream with gson
+	 * and store the objects into JsonBody
 	 */ 
     private JsonBody getJsonFromUrl(String urlStr) {
         try {
@@ -110,9 +108,8 @@ public class AsyncLoadActivity extends Activity {
     }
 
 	/** 
-	 * the task for get json data
-	 * parsing the data with gson
-	 * then display them on listview
+	 * Main job task to request json data, parse
+	 * and display them on list view
 	 */ 
     private class requestTask extends AsyncTask<Object, Void, Void> {
         JsonBody jsonData;
@@ -121,14 +118,15 @@ public class AsyncLoadActivity extends Activity {
         @Override
         protected void onPreExecute() {
         	/*
-        	 *  clear the cache first
+        	 * clear all the cache first
         	 */
         	if (mAdapter != null) {
         		mAdapter.clearCache();
         	}
         	/*
-        	 *  the refresh button is disabled when loading
-        	 *  and tell users loading now
+        	 *  the 'Reload' button is disabled before 
+        	 *  the task is over and tell the user loading now
+        	 *  with a progress dialog
         	 */
         	mButton.setEnabled(false);
         	progressDialog = ProgressDialog.show(AsyncLoadActivity.this, 
@@ -145,8 +143,8 @@ public class AsyncLoadActivity extends Activity {
         protected void onPostExecute(Void result) {
         	/*
         	 *  finish loading, dismiss the dialog
+        	 *  enable the 'Reload' button
         	 */
-        	progressDialog.dismiss();
             if (jsonData != null) {
             	/*
             	 *  parse successfully
@@ -157,7 +155,8 @@ public class AsyncLoadActivity extends Activity {
             	}
             	if (jsonData.getRows() != null) {
             		/*
-            		 *  set json data to adapter then set to listview
+            		 *  set json data to the adapter
+            		 *  then set the adapter to the list view
             		 */
                 	mList = (ListView)findViewById(R.id.list);
                 	mAdapter = new SimpleAdapter(AsyncLoadActivity.this, jsonData.getRows());
@@ -166,8 +165,9 @@ public class AsyncLoadActivity extends Activity {
             } else {
             	Toast.makeText(AsyncLoadActivity.this, 
             			Constants.TOAST_TEXT, Toast.LENGTH_SHORT
-            			).show(); 
-            }
+            			).show();         		
+        	}
+        	progressDialog.dismiss();
         	mButton.setEnabled(true);
         }
     }

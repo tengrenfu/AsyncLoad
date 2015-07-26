@@ -10,11 +10,11 @@ import java.util.List;
 
 public class JsonBody {	
 	/*
-	 * just the same with 'title' in the json response
+	 * it must be the same with 'title' in the json response
 	 */
 	private String title;
 	/*
-	 * just the same with 'rows' in the json response, it's an array
+	 * it must be the same with 'rows' in the json response, it's an array
 	 */
 	private List<JsonRowItem> rows;
 	

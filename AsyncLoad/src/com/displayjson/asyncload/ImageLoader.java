@@ -35,13 +35,16 @@ public class ImageLoader {
     	mImageViews = Collections.synchronizedMap(new WeakHashMap<ImageView, String>());
     	mMemoryCache = new ImageMemoryCache();
         mFileCache = new FileCache(context);
+        /*
+         * a thread pool is ready for downloading, decoding and displaying
+         * the image on the list view 
+         */
         executorService = Executors.newFixedThreadPool(Constants.THREAD_POOL_SIZE);
     }
     
     /*
-     * queue a task to get image from SD card
-     * or from web site and decode the image
-     * then display on UI 
+     * here queue a task to get the image from SD card
+     * or from web site, then decode and display it on the list view
      */
     private void queueImage(String url, ImageView imageView) {
         BitmapToLoad bitmapToLoad = new BitmapToLoad(url, imageView);
@@ -49,10 +52,8 @@ public class ImageLoader {
     }
     
     /*
-     * display the image on UI
-     * if image exist on memory, display it on the image view
-     * if not exist, then call queueImage to run
-     * a thread to get, decode and display 
+     * display the image on the list view if it's in memory
+     * or call queueImage to run a thread to download, decode and display it 
      */
     public void displayImageOnView(String url, ImageView imageView) {
     	if (url == null || imageView == null) {
@@ -61,10 +62,16 @@ public class ImageLoader {
         mImageViews.put(imageView, url);
         Bitmap bitmap = mMemoryCache.getImage(url);
         if (bitmap != null) {
+        	/*
+        	 * in memory cache, display it directly
+        	 */
         	if (imageView.getTag() != null && imageView.getTag().equals(url)) {
         		imageView.setImageBitmap(bitmap);
         	}
         } else {
+        	/*
+        	 * not in cache, queue a task thread here
+        	 */
         	queueImage(url, imageView);
         }
     }
@@ -129,7 +136,7 @@ public class ImageLoader {
     private Bitmap decodeImage(File file) {
         try {
             /*
-             * to get the size of the image first
+             * get the size of the image first
              */
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
@@ -175,8 +182,8 @@ public class ImageLoader {
     
     /**
      * call ImageDisplayer to display the image 
-     * on image view and ask the ui thread to 
-     * update the image view 
+     * on list view and ask the UI thread to 
+     * update the list view 
      */
     private class BitmapLoader implements Runnable {
     	BitmapToLoad mBitmapToLoad;
@@ -211,8 +218,7 @@ public class ImageLoader {
     }
     
     /**
-     * to display bitmap in the UI thread
-     * see run()
+     * ask the UI thread to set bitmap on list view
      */
     private class ImageDisplayer implements Runnable {
         Bitmap mBitmap;
@@ -233,6 +239,9 @@ public class ImageLoader {
         }
     }
 
+    /**
+     * clear all the cache in memory and sd card 
+     */
     public void clearCache() {
         mMemoryCache.clear();
         mFileCache.clear();

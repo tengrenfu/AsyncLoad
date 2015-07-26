@@ -24,10 +24,10 @@
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/refresh"
+            android:id="@+id/reload"
             android:layout_width="@dimen/button_layout_width"
             android:layout_height="@dimen/button_layout_height"
-            android:background="@drawable/round"
+            android:background="@drawable/button_background"
             android:layout_alignParentRight="true"
             android:layout_marginTop="@dimen/button_margin_top"
             android:layout_marginRight="@dimen/button_margin_right"

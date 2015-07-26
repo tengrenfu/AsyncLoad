@@ -42,7 +42,7 @@ public class AsyncLoadActivityTest extends
 	protected void setUp() throws Exception {
 		super.setUp();
 		mActivity = getActivity();
-		mButton = (Button)mActivity.findViewById(com.displayjson.asyncload.R.id.refresh);
+		mButton = (Button)mActivity.findViewById(com.displayjson.asyncload.R.id.reload);
 		mList = (ListView)mActivity.findViewById(com.displayjson.asyncload.R.id.list);
 		mTitle = (TextView)mActivity.findViewById(com.displayjson.asyncload.R.id.title);
 	}

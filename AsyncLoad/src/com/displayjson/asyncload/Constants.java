@@ -6,6 +6,9 @@
 package com.displayjson.asyncload;
 
 
+/** 
+ * Constant variables are put here
+ */ 
 public final class Constants {
 	
 	private Constants () {}  // this class can't be instanced

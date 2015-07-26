@@ -8,15 +8,15 @@ package com.displayjson.asyncload;
 
 public class JsonRowItem {
 	/* 
-	 * just the same with 'title' in every 'rows' array of the json response
+	 * it must be the same with 'title' in every 'rows' array of the json response
 	 */
 	private String title;
 	/* 
-	 * just the same with 'description' in every 'rows' array of the json response
+	 * it must be the same with 'description' in every 'rows' array of the json response
 	 */
 	private String description;
 	/*
-	 *  just the same with 'imageHref' in every 'rows' array of the json response
+	 * it must be the same with 'imageHref' in every 'rows' array of the json response
 	 */
 	private String imageHref;
 	
