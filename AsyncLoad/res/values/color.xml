@@ -7,5 +7,6 @@
     <color name="button_background_endcolor">#223158</color>
     <color name="row_background_startcolor">#ffffff</color>
     <color name="row_background_endcolor">#EDEDED</color>
+    <color name="transparent">#00000000</color>
     		
 </resources>

@@ -17,8 +17,8 @@ public class FileCache {
     
     public FileCache(Context context) {
     	/*
-    	 * create the directory to storage
-    	 * the image in SD card
+    	 * create the path to save the images 
+    	 * in SD card or cache directory
     	 */
     	File sdExternalDir = android.os.Environment.getExternalStorageDirectory();
         if (sdExternalDir.equals(android.os.Environment.MEDIA_MOUNTED)) {
@@ -32,7 +32,9 @@ public class FileCache {
     }
     
 	/**
-	 * get the image file with URL in SD card
+	 * get the image file with URL in file system
+	 * @param url  URL for the image
+	 * @return     the path for the image saved in file system
 	 */
     public File getFile(String url) {
     	String file_name;
@@ -47,7 +49,7 @@ public class FileCache {
     }
     
 	/**
-	 * clear all the images stored in SD card
+	 * clear all the images saved in files system
 	 */
     public void clear() {
     	try {

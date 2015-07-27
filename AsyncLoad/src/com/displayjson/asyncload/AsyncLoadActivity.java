@@ -68,6 +68,9 @@ public class AsyncLoadActivity extends Activity {
         }
     }; 
 
+	/* 
+	 * the listener for the list view
+	 */ 
     private class scrollListener implements OnScrollListener {
     	@Override  
     	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
@@ -77,7 +80,7 @@ public class AsyncLoadActivity extends Activity {
     	/** 
     	 * load the contents on the list view 
     	 * when on idle state, here to implement
-    	 * to load on demand
+    	 * to load on demand, in fact, we'd load image here
     	 */ 
     	@Override  
     	public void onScrollStateChanged(AbsListView view, int scrollState) {  
@@ -162,6 +165,9 @@ public class AsyncLoadActivity extends Activity {
 	 * get json data with http request from server
 	 * then parse the response stream with gson
 	 * and store the objects into JsonBody
+	 * TODO: I'd request the json with range request, 
+	 * that is I'd set 'Range' in every HTTP request header
+	 * it's necessary when the response is large
 	 */ 
     private JsonBody getJsonFromUrl(String urlStr) {
         try {
@@ -197,8 +203,9 @@ public class AsyncLoadActivity extends Activity {
     }
 
 	/** 
-	 * Main job task to request json data, parse
-	 * and display them on list view
+	 * the task to request json data, parse into
+	 * jsonBody, then set to adapter for list view to
+	 * display the row item
 	 */ 
     private class requestTask extends AsyncTask<Object, Void, Void> {
         ProgressDialog progressDialog;
@@ -233,17 +240,22 @@ public class AsyncLoadActivity extends Activity {
         	 *  finish loading, dismiss the dialog
         	 *  enable the 'Reload' button
         	 */
-            if (mJsonBody != null) {
+        	if (progressDialog.isShowing()) {
+        		progressDialog.dismiss();
+        	}
+        	mButton.setEnabled(true);
+        	if (mJsonBody != null) {
             	/*
             	 *  parse successfully
             	 */
             	if (mJsonBody.getTitle() != null) {
             		mTitle.setText(mJsonBody.getTitle());
+            	} else {
+            		mTitle.setText("");            		
             	}
             	if (mJsonBody.getRows() != null) {
             		/*
-            		 *  set json data to the adapter
-            		 *  then set the adapter to the list view
+            		 *  set json data to the adapter and set the adapter to the list view with a range
             		 */
                 	mAdapter = new SimpleAdapter(AsyncLoadActivity.this, getRangeRowItem(0, Constants.MAX_ONCE_LOAD));
                 	mListView.setAdapter(mAdapter);
@@ -253,8 +265,6 @@ public class AsyncLoadActivity extends Activity {
             			Constants.TOAST_TEXT, Toast.LENGTH_SHORT
             			).show();         		
         	}
-        	progressDialog.dismiss();
-        	mButton.setEnabled(true);
         }
     }
 

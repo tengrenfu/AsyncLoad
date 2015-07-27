@@ -67,9 +67,13 @@ public class SimpleAdapter extends BaseAdapter {
 
         if (item.getTitle() != null) {
         	holder.rowTitle.setText(item.getTitle());
+        } else {
+        	holder.rowTitle.setText("");
         }
         if (item.getDescription() != null) {
         	holder.descritpion.setText(item.getDescription());
+        } else {
+        	holder.descritpion.setText("");
         }
         if (item.getImageHref() != null) {
         	/*
@@ -81,6 +85,11 @@ public class SimpleAdapter extends BaseAdapter {
         	 */
         	holder.image.setTag(item.getImageHref());
             mImageLoader.displayImageOnView(item.getImageHref(), holder.image);
+        } else {
+        	/*
+        	 * set the image as transparent color if this item has no image
+        	 */
+        	holder.image.setImageResource(R.color.transparent);
         }
         
         return convertView;
@@ -94,8 +103,8 @@ public class SimpleAdapter extends BaseAdapter {
     }
 
 	/**
-	 * clear all the images' cache
-	 * whatever in memory or in SD card 
+	 * clear all the images' saved
+	 * whatever in memory or in file system 
 	 */
     public void clearCache() {
     	if (mImageLoader != null) {
@@ -103,7 +112,10 @@ public class SimpleAdapter extends BaseAdapter {
     	}
     }
     
-    public class ViewHolder {
+    /**
+     * item view holder for convert view
+     */
+    private class ViewHolder {
         public TextView rowTitle;
         public TextView descritpion;
         public ImageView image;

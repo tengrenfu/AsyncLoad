@@ -37,13 +37,13 @@ public class ImageLoader {
         mFileCache = new FileCache(context);
         /*
          * a thread pool is ready for downloading, decoding and displaying
-         * the image on the list view 
+         * the images on the list view 
          */
         executorService = Executors.newFixedThreadPool(Constants.THREAD_POOL_SIZE);
     }
     
-    /*
-     * here queue a task to get the image from SD card
+    /**
+     * here queue a task to get the image from file system
      * or from web site, then decode and display it on the list view
      */
     private void queueImage(String url, ImageView imageView) {
@@ -51,8 +51,8 @@ public class ImageLoader {
         executorService.submit(new BitmapLoader(bitmapToLoad));
     }
     
-    /*
-     * display the image on the list view if it's in memory
+    /**
+     * display the image on the list view if it's in memory cache
      * or call queueImage to run a thread to download, decode and display it 
      */
     public void displayImageOnView(String url, ImageView imageView) {
@@ -63,16 +63,18 @@ public class ImageLoader {
         Bitmap bitmap = mMemoryCache.getImage(url);
         if (bitmap != null) {
         	/*
-        	 * in memory cache, display it directly
+        	 * in memory cache, display it directly if the image view
+        	 * is't reused by another row item
         	 */
         	if (imageView.getTag() != null && imageView.getTag().equals(url)) {
         		imageView.setImageBitmap(bitmap);
         	}
         } else {
         	/*
-        	 * not in cache, queue a task thread here
+        	 * not in memory cache, queue a task thread to go on
         	 */
         	queueImage(url, imageView);
+        	imageView.setImageResource(R.color.transparent);
         }
     }
 
@@ -92,20 +94,22 @@ public class ImageLoader {
         }
     }
     
-    /*
-     * get image from cache or from website
+    /**
+     * get image from file system or from web site
+     * then decode the image
      */
     private Bitmap getBitmap(String url) {
     	/*
-    	 * get image from SD card first
+    	 * get image from file cache first
     	 */
-        File file = mFileCache.getFile(url);        
+        File file = mFileCache.getFile(url);
         Bitmap iamge = decodeImage(file);
         if (iamge != null) {
             return iamge;
         }        
         /*
-         * get image from website
+         * get image from web site and save it 
+         * in file system then decode the image
          */
         try {
             Bitmap bitmap = null;
@@ -130,8 +134,9 @@ public class ImageLoader {
         return null;
     }
 
-    /*
-     * decoding the image and scaling the image to reduce memory used
+    /**
+     * decoding the image according to 
+     * the proper scale to save memory used
      */
     private Bitmap decodeImage(File file) {
         try {
@@ -142,8 +147,9 @@ public class ImageLoader {
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeStream(new FileInputStream(file), null, options);            
             /*
-             * the width or height of the image should be smaller than 
-             * Constants.REQUIRED_IMAGE_SIZE
+             * here calculate the scale for next step to decode
+             * according to the width or height of the image 
+             * is smaller than Constants.REQUIRED_IMAGE_SIZE
              */
             int scale = 1;
             int width = options.outWidth, height = options.outHeight;
@@ -157,7 +163,7 @@ public class ImageLoader {
                 scale = scale * 2;
             }
             /*
-             * then decode the image with inSampleSize
+             * then decode the image according to the scale
              */
             BitmapFactory.Options opt = new BitmapFactory.Options();
             opt.inSampleSize = scale;
@@ -194,21 +200,33 @@ public class ImageLoader {
         
         @Override
         public void run() {
-            if (canImageViewReused(mBitmapToLoad)) {
+            if (isImageViewReused(mBitmapToLoad)) {
                 return;
             }
+            /*
+             * now the image view isn't used by another row item
+             * get the image then put in memory cache
+             */
             Bitmap bitmap = getBitmap(mBitmapToLoad.mUrl);
             mMemoryCache.putImage(mBitmapToLoad.mUrl, bitmap);
-            if (canImageViewReused(mBitmapToLoad)) {
+            if (isImageViewReused(mBitmapToLoad)) {
                 return;
             }
+            /*
+             * now the image view isn't used by another row item
+             * ask the UI thread to display the image
+             */
             ImageDisplayer displayer = new ImageDisplayer(bitmap, mBitmapToLoad);
             Activity activity = (Activity)mBitmapToLoad.mImageView.getContext();
             activity.runOnUiThread(displayer);
         }
     }
     
-    private boolean canImageViewReused(BitmapToLoad bitmapToLoad){
+    /**
+     * to determine whether this image has been used by another
+     * row item, it caused by reuse the convert view in 'getView'
+     */
+    private boolean isImageViewReused(BitmapToLoad bitmapToLoad){
         String tag = mImageViews.get(bitmapToLoad.mImageView);
         
         if (tag == null || !tag.equals(bitmapToLoad.mUrl)) {
@@ -230,17 +248,19 @@ public class ImageLoader {
         }
         
         public void run() {
-            if (canImageViewReused(mPhoto)) {
+            if (isImageViewReused(mPhoto)) {
                 return;
             }
             if (mBitmap != null && mPhoto != null) {
             	mPhoto.mImageView.setImageBitmap(mBitmap);
+            } else {
+            	mPhoto.mImageView.setImageResource(R.color.transparent);            	
             }
         }
     }
 
     /**
-     * clear all the cache in memory and sd card 
+     * clear all the image saved in memory and file system 
      */
     public void clearCache() {
         mMemoryCache.clear();

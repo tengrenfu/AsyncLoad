@@ -20,9 +20,6 @@ public class ImageMemoryCache {
     private Map<String, Bitmap> mCache;
 
     public ImageMemoryCache() {
-    	/*
-    	 *  25% of JVM heap size
-    	 */
     	long size = Runtime.getRuntime().maxMemory() / Constants.JVM_MEMORY_DIV;
     	if (size > maxSize) {
     		setMaxSize(size);
@@ -37,6 +34,8 @@ public class ImageMemoryCache {
 
 	/**
 	 * get the image from mCache by URL
+	 * @param  id  URL of the image to get
+	 * @return     the image decoded in memory
 	 */
     public Bitmap getImage(String id) {
     	if (id == null) {
@@ -82,9 +81,9 @@ public class ImageMemoryCache {
     }
 
 	/**
-	 * put the image into mCache
-	 * then check the cache size limit
-	 * by calling checkLimit() 
+	 * put the image into mCache and check cache size limit
+	 * @param  id       URL for the image to get
+	 * @param  bitmap   the corresponding image decoded to save
 	 */
     public void putImage(String id, Bitmap bitmap) {
     	if (id == null || bitmap == null) {
