@@ -8,5 +8,10 @@
     <color name="row_background_startcolor">#ffffff</color>
     <color name="row_background_endcolor">#EDEDED</color>
     <color name="transparent">#00000000</color>
-    		
+    <color name="gray_cccccc">#cccccc</color>
+    <color name="gray_333333">#333333</color>
+    <color name="gray_666666">#666666</color>
+    <color name="gray_start_normal">#859198</color>
+    <color name="gray_end_normal">#68737c</color>
+    
 </resources>

@@ -25,9 +25,9 @@
 
         <Button
             android:id="@+id/reload"
+            style="@style/GrayButtonNoCorner"
             android:layout_width="@dimen/button_layout_width"
             android:layout_height="@dimen/button_layout_height"
-            android:background="@drawable/button_background"
             android:layout_alignParentRight="true"
             android:layout_marginTop="@dimen/button_margin_top"
             android:layout_marginRight="@dimen/button_margin_right"
@@ -45,6 +45,7 @@
         android:layout_marginBottom="@dimen/listview_margin_bottom"
         android:layout_marginRight="@dimen/listview_margin_right"
         android:drawSelectorOnTop="false"
+        android:cacheColorHint="#00000000"
         android:scrollbarStyle="outsideOverlay" />
 
 </LinearLayout>

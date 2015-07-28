@@ -20,6 +20,7 @@ public final class Constants {
 	public static final String  HTTP_REQUEST_METHOD = "GET";    //do NOT change this value
 	public static final String  CACHE_DIR = "ImageCache";
 	public static final String  ENCODE_CHARSET = "UTF-8";
+	public static final String  LOADING_MORE = "Loading...";
 	
 	public static final int  MAX_ONCE_LOAD = 10;
 	public static final int  DELAY = 1000;

@@ -4,40 +4,47 @@
     android:layout_height="wrap_content"
     android:background="@drawable/row_item_background"
     android:orientation="vertical"
-    >
+    android:paddingTop="@dimen/list_item_margin_top_bottom" >
 
-    <TextView
-        android:id="@+id/row_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:singleLine="false"
-        android:layout_weight="1"
-        android:textColor="@color/row_title_color"
-        android:textSize="@dimen/row_title_textsize" />
-    
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" 
-        >
+        android:layout_height="wrap_content" >
 
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/row_descript_margin_bottom"
-            android:layout_alignParentLeft="true"
             android:layout_toLeftOf="@+id/image"
-            android:gravity="left"
-            android:singleLine="false" />
-
+            android:orientation="vertical" >
+            
+			<TextView
+        		android:id="@+id/row_title"
+        		android:layout_width="match_parent"
+        		android:layout_height="wrap_content"
+        		android:layout_gravity="center_vertical"
+        		android:singleLine="false"
+        		android:textColor="@color/row_title_color"
+        		android:textSize="@dimen/row_title_textsize" 
+        		android:textStyle="bold" />
+    
+        	<TextView
+            	android:id="@+id/description"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_marginBottom="@dimen/row_descript_margin_bottom"
+            	android:layout_alignParentLeft="true"
+            	android:gravity="left"
+            	android:singleLine="false" />
+        	
+        </LinearLayout>
+        	
         <ImageView
             android:id="@+id/image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft = "@dimen/imageview_layout_margin_left" />
+            android:layout_marginLeft = "@dimen/imageview_layout_margin" 
+            android:layout_marginRight = "@dimen/imageview_layout_margin" />
 
     </RelativeLayout>
 
