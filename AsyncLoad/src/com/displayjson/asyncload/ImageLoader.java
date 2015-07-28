@@ -8,16 +8,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.BufferedHttpEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
 import android.content.Context;
@@ -159,18 +165,18 @@ public class ImageLoader {
          */
         try {
             Bitmap bitmap = null;
-            URL imageUrl = new URL(url);
-            HttpURLConnection conn = (HttpURLConnection)imageUrl.openConnection();
-            conn.setConnectTimeout(Constants.IMAGE_CONNECT_TIMEOUT);
-            conn.setReadTimeout(Constants.IMAGE_READ_TIME);
-            conn.setInstanceFollowRedirects(true);
+            HttpGet request = new HttpGet(url);
+            HttpClient client = new DefaultHttpClient();
+            HttpResponse response = (HttpResponse) client.execute(request);
+            HttpEntity entity = response.getEntity();
+            BufferedHttpEntity bufferedEntity = new BufferedHttpEntity(entity);
             
-            InputStream src = conn.getInputStream();
+            InputStream src = bufferedEntity.getContent();            
             OutputStream dst = new FileOutputStream(file);
             copyStream(src, dst);
             dst.close();
             
-            bitmap = decodeImage(file);
+            bitmap = decodeImage(bufferedEntity);
             return bitmap;
         } catch (Throwable e){
            if (e instanceof OutOfMemoryError) {
@@ -183,7 +189,7 @@ public class ImageLoader {
     /**
      * decoding the image according to 
      * the proper scale to save memory used
-     */
+     */    
     private Bitmap decodeImage(File file) {
         try {
             /*
@@ -212,9 +218,51 @@ public class ImageLoader {
              * then decode the image according to the scale
              */
             BitmapFactory.Options opt = new BitmapFactory.Options();
+            opt.inJustDecodeBounds = false;
             opt.inSampleSize = scale;
             return BitmapFactory.decodeStream(new FileInputStream(file), null, opt);
         } catch (FileNotFoundException e) {
+        }
+        return null;
+    }
+    
+    /**
+     * decode the image from bufferd http entity
+     * to fix skia errors when decoding
+     */    
+    private Bitmap decodeImage(BufferedHttpEntity entity) {
+        try {
+            /*
+             * get the size of the image first
+             */
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(entity.getContent(), null, options);            
+            /*
+             * here calculate the scale for next step to decode
+             * according to the width or height of the image 
+             * is smaller than Constants.REQUIRED_IMAGE_SIZE
+             */
+            int scale = 1;
+            int width = options.outWidth, height = options.outHeight;
+            for (;;) {
+                if (width / 2 < Constants.REQUIRED_IMAGE_SIZE ||
+                		height / 2 < Constants.REQUIRED_IMAGE_SIZE) {
+                    break;
+                }
+                width = width / 2;
+                height = height / 2;
+                scale = scale * 2;
+            }
+            /*
+             * then decode the image according to the scale
+             */
+            BitmapFactory.Options opt = new BitmapFactory.Options();
+            opt.inJustDecodeBounds = false;
+            opt.inSampleSize = scale;
+            return BitmapFactory.decodeStream(entity.getContent(), null, opt);
+        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
         }
         return null;
     }
