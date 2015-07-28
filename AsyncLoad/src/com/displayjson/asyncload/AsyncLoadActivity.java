@@ -37,7 +37,7 @@ public class AsyncLoadActivity extends Activity {
     private int mVisibleLastIndex;
     private SimpleAdapter mAdapter;
     private JsonBody mJsonBody;
-    private Handler mHandler = new Handler();  
+    private Handler mHandler = new Handler();
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,16 +45,50 @@ public class AsyncLoadActivity extends Activity {
 		setContentView(R.layout.activity_async_load);
 		
 		mVisibleLastIndex = 0;
-    	mTitle = (TextView)findViewById(R.id.title);
-		mButton = (Button)findViewById(R.id.reload);
-		mButton.setOnClickListener(listener);
-		mListView = (ListView)findViewById(R.id.list);
-		mListView.setOnScrollListener(new scrollListener());
+		initView();
 		/* 
 		 * start a task to request json data 
 		 * and display the contents on the list view
 		 */ 
         new requestTask().execute();
+	}
+
+	private void initView() {
+		mTitle = (TextView) findViewById(R.id.title);
+		mButton = (Button) findViewById(R.id.reload);
+		mButton.setOnClickListener(listener);
+		mListView = (ListView) findViewById(R.id.list);
+		mListView.setOnScrollListener(new scrollListener());
+	}
+
+	/**
+	 * after json data is parsed, set row items to list view
+	 */
+	private void setToListView(JsonBody jsonBody) {
+		if (jsonBody != null) {
+			/*
+			 * parse successfully
+			 */
+			if (jsonBody.getTitle() != null) {
+				mTitle.setText(jsonBody.getTitle());
+			} else {
+				mTitle.setText("");
+			}
+			if (jsonBody.getRows() != null && mListView != null) {
+				/*
+				 * set json data to the adapter and set the adapter to the list
+				 * view with a range
+				 */
+				if (mAdapter == null) {
+					mAdapter = new SimpleAdapter(AsyncLoadActivity.this,
+							getRangeRowItem(0, Constants.MAX_ONCE_LOAD));
+					mListView.setAdapter(mAdapter);
+				} else {
+					mAdapter.setAdapterData(getRangeRowItem(0, Constants.MAX_ONCE_LOAD));
+					mAdapter.notifyDataSetChanged();
+				}
+			}
+		}
 	}
 
 	/* 
@@ -73,7 +107,8 @@ public class AsyncLoadActivity extends Activity {
 	 */ 
     private class scrollListener implements OnScrollListener {
     	@Override  
-    	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+    	public void onScroll(AbsListView view, int firstVisibleItem, 
+    			                      int visibleItemCount, int totalItemCount) {
     		mVisibleLastIndex = firstVisibleItem + visibleItemCount;
     	}  
   
@@ -123,8 +158,7 @@ public class AsyncLoadActivity extends Activity {
         }
         for (int i = count; i < end; i++) {
         	mAdapter.addRowItems(mJsonBody.getRows().get(i));
-        }  
-        
+        }          
     }  
     
 	/** 
@@ -159,7 +193,6 @@ public class AsyncLoadActivity extends Activity {
     	mListView.setAdapter(null);
         super.onDestroy();
     }
-
 
 	/** 
 	 * get json data with http request from server
@@ -209,7 +242,7 @@ public class AsyncLoadActivity extends Activity {
 	 */ 
     private class requestTask extends AsyncTask<Object, Void, Void> {
         ProgressDialog progressDialog;
-
+    	
         @Override
         protected void onPreExecute() {
         	/*
@@ -218,14 +251,14 @@ public class AsyncLoadActivity extends Activity {
         	if (mAdapter != null) {
         		mAdapter.clearCache();
         	}
-        	/*
-        	 *  the 'Reload' button is disabled before 
-        	 *  the task is over and tell the user loading now
-        	 *  with a progress dialog
-        	 */
-        	mButton.setEnabled(false);
-        	progressDialog = ProgressDialog.show(AsyncLoadActivity.this, 
-        			Constants.PROGRESS_DIALOG_TITLE, Constants.PROGRESS_DIALOG_DESCRIPT); 
+			/*
+			 * the 'Reload' button is disabled before the task is over and tell
+			 * the user loading now with a progress dialog
+			 */
+			mButton.setEnabled(false);
+			progressDialog = ProgressDialog.show(AsyncLoadActivity.this,
+								Constants.PROGRESS_DIALOG_TITLE, 
+								Constants.PROGRESS_DIALOG_DESCRIPT);
         }
         
         @Override
@@ -236,35 +269,22 @@ public class AsyncLoadActivity extends Activity {
 
         @Override
         protected void onPostExecute(Void result) {
-        	/*
-        	 *  finish loading, dismiss the dialog
-        	 *  enable the 'Reload' button
-        	 */
-        	if (progressDialog.isShowing()) {
-        		progressDialog.dismiss();
-        	}
-        	mButton.setEnabled(true);
-        	if (mJsonBody != null) {
-            	/*
-            	 *  parse successfully
-            	 */
-            	if (mJsonBody.getTitle() != null) {
-            		mTitle.setText(mJsonBody.getTitle());
-            	} else {
-            		mTitle.setText("");            		
-            	}
-            	if (mJsonBody.getRows() != null) {
-            		/*
-            		 *  set json data to the adapter and set the adapter to the list view with a range
-            		 */
-                	mAdapter = new SimpleAdapter(AsyncLoadActivity.this, getRangeRowItem(0, Constants.MAX_ONCE_LOAD));
-                	mListView.setAdapter(mAdapter);
-            	}
+			/*
+			 * finish loading, dismiss the dialog enable the 'Reload' button
+			 */
+			if (!AsyncLoadActivity.this.isFinishing() && progressDialog.isShowing()) {
+				progressDialog.dismiss();
+			}
+            mButton.setEnabled(true);
+    		/*
+    		 * set json object to adapter then to list view
+    		 */
+            if (mJsonBody != null) {
+                setToListView(mJsonBody);
             } else {
-            	Toast.makeText(AsyncLoadActivity.this, 
-            			Constants.TOAST_TEXT, Toast.LENGTH_SHORT
-            			).show();         		
-        	}
+                Toast.makeText(AsyncLoadActivity.this, Constants.TOAST_TEXT,
+						Toast.LENGTH_SHORT).show();
+	        }
         }
     }
 

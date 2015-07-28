@@ -29,6 +29,14 @@ public class SimpleAdapter extends BaseAdapter {
     	mImageLoader = new ImageLoader(mActivity.getApplicationContext());
     }
     
+	/**
+	 * reset mList
+	 * @param list  the list contains json row items
+	 */
+	public void setAdapterData(List<JsonRowItem> list) {
+		mList = list;
+	}
+	
 	@Override
 	public int getCount() {
     	return mList.size();
@@ -89,6 +97,7 @@ public class SimpleAdapter extends BaseAdapter {
         	/*
         	 * set the image as transparent color if this item has no image
         	 */
+        	holder.image.setTag("");
         	holder.image.setImageResource(R.color.transparent);
         }
         

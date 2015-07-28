@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
@@ -29,10 +30,12 @@ public class ImageLoader {
     private ImageMemoryCache mMemoryCache;
     private FileCache mFileCache;
     private Map<ImageView, String> mImageViews;
+    private Map<String, BitmapLoader> mThreads;
     private ExecutorService executorService; 
     
     public ImageLoader(Context context) {
     	mImageViews = Collections.synchronizedMap(new WeakHashMap<ImageView, String>());
+    	mThreads = new HashMap<String, BitmapLoader>();
     	mMemoryCache = new ImageMemoryCache();
         mFileCache = new FileCache(context);
         /*
@@ -43,14 +46,56 @@ public class ImageLoader {
     }
     
     /**
-     * here queue a task to get the image from file system
+     * if URL has not be used to download and decode the image 
+     * the queue a task to get the image from file system
      * or from web site, then decode and display it on the list view
      */
     private void queueImage(String url, ImageView imageView) {
         BitmapToLoad bitmapToLoad = new BitmapToLoad(url, imageView);
-        executorService.submit(new BitmapLoader(bitmapToLoad));
+        BitmapLoader loader = new BitmapLoader(bitmapToLoad);
+        if (url != null && imageView != null && needRunNewThread(imageView)) {
+        	executorService.submit(loader);
+        	mThreads.put(url, loader);
+        }
     }
-    
+
+    /**
+     * if the working threads pools contain the URL has been 
+     * set to the image view, return false, otherwise return true
+     */
+    private boolean needRunNewThread(ImageView imageView) { 
+        boolean ret = true; 
+        if (imageView != null) {
+            String url = (String)imageView.getTag();
+            if (isThreadsContains(url)) {
+                ret = false; 
+            } 
+        } 
+        return ret; 
+    } 
+
+    /**
+     *  the working threads pools contain the URL
+     *  return true, or return false
+     */
+    private boolean isThreadsContains(String url) {
+        boolean ret = false; 
+        if (mThreads != null && mThreads.get(url) != null) {
+            ret = true; 
+        } 
+        return ret; 
+    } 
+
+    /**
+     *  remove the URL from the working threads pools
+     *  because the corresponding work has been done.
+     */
+    private void removeThreadForCache(String url) { 
+        if (url != null && mThreads != null && mThreads.get(url) != null) { 
+            mThreads.remove(url); 
+        } 
+    } 
+
     /**
      * display the image on the list view if it's in memory cache
      * or call queueImage to run a thread to download, decode and display it 
@@ -68,6 +113,7 @@ public class ImageLoader {
         	 */
         	if (imageView.getTag() != null && imageView.getTag().equals(url)) {
         		imageView.setImageBitmap(bitmap);
+        		imageView.setTag("");
         	}
         } else {
         	/*
@@ -209,6 +255,10 @@ public class ImageLoader {
              */
             Bitmap bitmap = getBitmap(mBitmapToLoad.mUrl);
             mMemoryCache.putImage(mBitmapToLoad.mUrl, bitmap);
+            /*
+             * remove the URL from the working thread pools
+             */
+            removeThreadForCache(mBitmapToLoad.mUrl);
             if (isImageViewReused(mBitmapToLoad)) {
                 return;
             }
@@ -253,6 +303,7 @@ public class ImageLoader {
             }
             if (mBitmap != null && mPhoto != null) {
             	mPhoto.mImageView.setImageBitmap(mBitmap);
+            	mPhoto.mImageView.setTag("");
             } else {
             	mPhoto.mImageView.setImageResource(R.color.transparent);            	
             }
@@ -265,6 +316,8 @@ public class ImageLoader {
     public void clearCache() {
         mMemoryCache.clear();
         mFileCache.clear();
+        mImageViews.clear();
+        mThreads.clear();
     }
 
 }

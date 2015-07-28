@@ -41,5 +41,12 @@ public class SimpleAdapterTest extends AndroidTestCase {
 	@Test
 	public void testClearCache() {
 	}
+	@Test
+	public void testSetAdapterData() {
+	}
+
+	@Test
+	public void testAddRowItems() {
+	}
 
 }
