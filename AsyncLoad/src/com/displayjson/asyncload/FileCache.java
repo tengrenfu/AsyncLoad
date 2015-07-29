@@ -20,9 +20,8 @@ public class FileCache {
     	 * create the path to save the images 
     	 * in SD card or cache directory
     	 */
-    	File sdExternalDir = android.os.Environment.getExternalStorageDirectory();
-        if (sdExternalDir.equals(android.os.Environment.MEDIA_MOUNTED)) {
-        	mCacheDir = new File(sdExternalDir, Constants.CACHE_DIR);
+        if (android.os.Environment.MEDIA_MOUNTED.equals(android.os.Environment.getExternalStorageState())) {
+        	mCacheDir = new File(android.os.Environment.getExternalStorageDirectory(), Constants.CACHE_DIR);
         } else {
         	mCacheDir = context.getCacheDir();
         }

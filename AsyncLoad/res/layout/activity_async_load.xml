@@ -8,7 +8,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/title_layout_height"
-        android:background="@color/title_backround"
+        android:background="@drawable/title_bar_background"
         android:gravity="center_vertical" >
 
         <TextView
@@ -45,7 +45,7 @@
         android:layout_marginBottom="@dimen/listview_margin_bottom"
         android:layout_marginRight="@dimen/listview_margin_right"
         android:drawSelectorOnTop="false"
-        android:cacheColorHint="#00000000"
+        android:cacheColorHint="@color/transparent"
         android:scrollbarStyle="outsideOverlay" />
 
 </LinearLayout>

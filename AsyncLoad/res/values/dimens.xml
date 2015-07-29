@@ -23,6 +23,7 @@
     <dimen name="row_title_textsize">15dp</dimen>
     <dimen name="row_descript_margin_bottom">10dp</dimen>
     <dimen name="imageview_layout_margin">10dp</dimen>
+    <dimen name="titlebar_background_padding">0dp</dimen>
     
     
 </resources>

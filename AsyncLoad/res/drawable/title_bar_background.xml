@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:shape="rectangle" >
+    
+    <gradient
+    	android:startColor="@color/titlebar_background_startcolor"
+    	android:endColor="@color/titlebar_background_endcolor"
+    	android:angle="270.0"
+    	android:centerY="0.5"
+    	android:centerColor="@color/titlebar_background_centercolor" />
+    
+    <padding
+    	android:left="@dimen/titlebar_background_padding"
+    	android:top="@dimen/titlebar_background_padding"
+    	android:right="@dimen/titlebar_background_padding"
+    	android:bottom="@dimen/titlebar_background_padding" />
+    
+</shape>

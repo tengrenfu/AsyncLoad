@@ -12,6 +12,9 @@
     <color name="gray_333333">#333333</color>
     <color name="gray_666666">#666666</color>
     <color name="gray_start_normal">#859198</color>
-    <color name="gray_end_normal">#68737c</color>
+    <color name="gray_end_normal">#68737c</color>    
+    <color name="titlebar_background_startcolor">#FF4279D0</color>
+    <color name="titlebar_background_endcolor">#FF2265D0</color>
+    <color name="titlebar_background_centercolor">#FF0353D2</color>
     
 </resources>

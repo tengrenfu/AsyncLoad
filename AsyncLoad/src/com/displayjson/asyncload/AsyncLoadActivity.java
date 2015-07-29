@@ -34,8 +34,6 @@ public class AsyncLoadActivity extends Activity {
     private Button mButton;
     private ListView mListView;
     private TextView mTitle;
-	private View mLoadMore;
-	private Button mLoadMoreButton;
     private int mVisibleLastIndex;
     private SimpleAdapter mAdapter;
     private JsonBody mJsonBody;
@@ -61,9 +59,6 @@ public class AsyncLoadActivity extends Activity {
 		mButton.setOnClickListener(listener);
 		mListView = (ListView) findViewById(R.id.list);
 		mListView.setOnScrollListener(new scrollListener());
-		mLoadMore = getLayoutInflater().inflate(R.layout.load_more, null);
-		mLoadMoreButton = (Button) mLoadMore.findViewById(R.id.loadMoreButton);
-		mLoadMoreButton.setEnabled(false);		
 	}
 
 	/**
@@ -139,13 +134,10 @@ public class AsyncLoadActivity extends Activity {
 	 * adapter then notify state changed 
 	 */ 
     private void loadMore() {
-		mListView.addFooterView(mLoadMore);
-		mLoadMoreButton.setText(Constants.LOADING_MORE);
         mHandler.postDelayed(new Runnable() {
             @Override  
             public void run() {
                 loadData();  
-				mListView.removeFooterView(mLoadMore);
                 mAdapter.notifyDataSetChanged();
             }  
         }, Constants.DELAY);  
