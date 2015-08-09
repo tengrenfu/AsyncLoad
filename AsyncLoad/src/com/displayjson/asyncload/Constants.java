@@ -34,5 +34,7 @@ public final class Constants {
 	public static final int  REQUIRED_IMAGE_SIZE = 80;
 	public static final int  MAX_MEMORY_CACHE_SIZE = 1048576;
 	public static final int  JVM_MEMORY_DIV = 4;
+	public static final int  MAX_Y_OVERSCROLL_DISTANCE = 50;
+	public static final float  MAX_DISK_UNUSED_PERCENT = 0.15f;
 	
 }

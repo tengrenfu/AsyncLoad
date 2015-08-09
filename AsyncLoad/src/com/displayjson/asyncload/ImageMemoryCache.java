@@ -28,7 +28,7 @@ public class ImageMemoryCache {
                 new LinkedHashMap<String, Bitmap>(10, 1.5f, true));
     }
     
-    private void setMaxSize(long max){
+    private void setMaxSize(long max) {
         maxSize = max;
     }
 
@@ -96,7 +96,7 @@ public class ImageMemoryCache {
             mCache.put(id, bitmap);
             currentSize += getImageSize(bitmap);
             checkLimit();
-        } catch (Throwable e){
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }

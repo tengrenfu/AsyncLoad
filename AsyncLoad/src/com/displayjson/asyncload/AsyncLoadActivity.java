@@ -19,22 +19,15 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AbsListView;  
-import android.widget.AbsListView.OnScrollListener;  
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 
 
-public class AsyncLoadActivity extends Activity {
-    private Button mButton;
-    private ListView mListView;
+public class AsyncLoadActivity extends Activity implements OnRefreshListener {
+    private EnhancedListView mListView;
     private TextView mTitle;
-    private int mVisibleLastIndex;
     private SimpleAdapter mAdapter;
     private JsonBody mJsonBody;
     private Handler mHandler = new Handler();
@@ -44,7 +37,6 @@ public class AsyncLoadActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_async_load);
 		
-		mVisibleLastIndex = 0;
 		initView();
 		/* 
 		 * start a task to request json data 
@@ -55,10 +47,8 @@ public class AsyncLoadActivity extends Activity {
 
 	private void initView() {
 		mTitle = (TextView) findViewById(R.id.title);
-		mButton = (Button) findViewById(R.id.reload);
-		mButton.setOnClickListener(listener);
-		mListView = (ListView) findViewById(R.id.list);
-		mListView.setOnScrollListener(new scrollListener());
+		mListView = (EnhancedListView) findViewById(R.id.list);
+		mListView.setOnRefreshListener(this);
 	}
 
 	/**
@@ -85,49 +75,10 @@ public class AsyncLoadActivity extends Activity {
 					mListView.setAdapter(mAdapter);
 				} else {
 					mAdapter.setAdapterData(getRangeRowItem(0, Constants.MAX_ONCE_LOAD));
-					mAdapter.notifyDataSetChanged();
 				}
 			}
 		}
 	}
-
-	/* 
-	 * the click listener for 'Reload' button,   
-	 * to start a task to request json data and display 
-	 * the contents on the list view when it's clicked
-	 */ 
-    Button.OnClickListener listener = new Button.OnClickListener() {     
-        public void onClick(View v) {
-            new requestTask().execute();
-        }
-    }; 
-
-	/* 
-	 * the listener for the list view
-	 */ 
-    private class scrollListener implements OnScrollListener {
-    	@Override  
-    	public void onScroll(AbsListView view, int firstVisibleItem, 
-    			                      int visibleItemCount, int totalItemCount) {
-    		mVisibleLastIndex = firstVisibleItem + visibleItemCount;
-    	}  
-  
-    	/** 
-    	 * load the contents on the list view 
-    	 * when on idle state, here to implement
-    	 * to load on demand, in fact, we'd load image here
-    	 */ 
-    	@Override  
-    	public void onScrollStateChanged(AbsListView view, int scrollState) {  
-    		int itemsLastIndex = mAdapter.getCount() - 1;
-    		if (scrollState == OnScrollListener.SCROLL_STATE_IDLE 
-    				&& mVisibleLastIndex >= itemsLastIndex) {
-    			if (mAdapter.getCount() < mJsonBody.getRows().size()) {
-    				loadMore();
-    			}
-    		}
-    	}
-    }
 
 	/** 
 	 * run a thread to add more items to
@@ -139,8 +90,9 @@ public class AsyncLoadActivity extends Activity {
             public void run() {
                 loadData();  
                 mAdapter.notifyDataSetChanged();
+                mListView.hideFooterView();
             }  
-        }, Constants.DELAY);  
+        }, Constants.DELAY);
     }  
       
 	/** 
@@ -150,6 +102,7 @@ public class AsyncLoadActivity extends Activity {
         int end;
         int count = mAdapter.getCount();
         if (count >= mJsonBody.getRows().size()) {
+        	mListView.setAllLoaded(true);
         	return;
         }
         end = count + Constants.MAX_ONCE_LOAD;
@@ -252,10 +205,9 @@ public class AsyncLoadActivity extends Activity {
         		mAdapter.clearCache();
         	}
 			/*
-			 * the 'Reload' button is disabled before the task is over and tell
+			 * before the task is over, tell
 			 * the user loading now with a progress dialog
 			 */
-			mButton.setEnabled(false);
 			progressDialog = ProgressDialog.show(AsyncLoadActivity.this,
 								Constants.PROGRESS_DIALOG_TITLE, 
 								Constants.PROGRESS_DIALOG_DESCRIPT);
@@ -270,17 +222,19 @@ public class AsyncLoadActivity extends Activity {
         @Override
         protected void onPostExecute(Void result) {
 			/*
-			 * finish loading, dismiss the dialog enable the 'Reload' button
+			 * finish loading, dismiss the dialog
 			 */
 			if (!AsyncLoadActivity.this.isFinishing() && progressDialog.isShowing()) {
 				progressDialog.dismiss();
 			}
-            mButton.setEnabled(true);
     		/*
     		 * set json object to adapter then to list view
     		 */
             if (mJsonBody != null) {
                 setToListView(mJsonBody);
+				mAdapter.notifyDataSetChanged();
+				mListView.hideHeaderView();
+				mListView.setAllLoaded(false);
             } else {
                 Toast.makeText(AsyncLoadActivity.this, Constants.TOAST_TEXT,
 						Toast.LENGTH_SHORT).show();
@@ -288,4 +242,14 @@ public class AsyncLoadActivity extends Activity {
         }
     }
 
+    @Override  
+    public void onDownPullRefresh() {
+    	new requestTask().execute();
+    }
+    
+    @Override  
+    public void onLoadingMore() {
+    	loadMore();
+    }
+    
 }

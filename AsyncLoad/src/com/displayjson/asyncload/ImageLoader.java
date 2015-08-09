@@ -29,6 +29,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.widget.ImageView;
 
 
@@ -142,7 +143,7 @@ public class ImageLoader {
             	}
             	dst.write(bytes, 0, size);
             }
-        } catch(Exception e){
+        } catch(Exception e) {
         }
     }
     
@@ -155,7 +156,7 @@ public class ImageLoader {
     	 * get image from file cache first
     	 */
         File file = mFileCache.getFile(url);
-        Bitmap iamge = decodeImage(file);
+        Bitmap iamge = decodeImage(file, 160, 120);
         if (iamge != null) {
             return iamge;
         }        
@@ -176,9 +177,9 @@ public class ImageLoader {
             copyStream(src, dst);
             dst.close();
             
-            bitmap = decodeImage(bufferedEntity);
+            bitmap = decodeImage(bufferedEntity, 160, 120);
             return bitmap;
-        } catch (Throwable e){
+        } catch (Throwable e) {
            if (e instanceof OutOfMemoryError) {
                mMemoryCache.clear();
            }
@@ -186,87 +187,44 @@ public class ImageLoader {
         return null;
     }
 
-    /**
-     * decoding the image according to 
-     * the proper scale to save memory used
-     */    
-    private Bitmap decodeImage(File file) {
-        try {
-            /*
-             * get the size of the image first
-             */
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(new FileInputStream(file), null, options);            
-            /*
-             * here calculate the scale for next step to decode
-             * according to the width or height of the image 
-             * is smaller than Constants.REQUIRED_IMAGE_SIZE
-             */
-            int scale = 1;
-            int width = options.outWidth, height = options.outHeight;
-            for (;;) {
-                if (width / 2 < Constants.REQUIRED_IMAGE_SIZE ||
-                		height / 2 < Constants.REQUIRED_IMAGE_SIZE) {
-                    break;
-                }
-                width = width / 2;
-                height = height / 2;
-                scale = scale * 2;
-            }
-            /*
-             * then decode the image according to the scale
-             */
-            BitmapFactory.Options opt = new BitmapFactory.Options();
-            opt.inJustDecodeBounds = false;
-            opt.inSampleSize = scale;
-            return BitmapFactory.decodeStream(new FileInputStream(file), null, opt);
-        } catch (FileNotFoundException e) {
-        }
-        return null;
+    private Bitmap resizeImage(Bitmap bitmap, int width, int height) {
+    	if (bitmap == null || width <=0 || height <= 0) {
+    		return null;
+    	}
+        int orgWidth = bitmap.getWidth();
+        int orgHeight = bitmap.getHeight();
+        int newWidth = width;
+        int newHeight = height;
+ 
+        float scaleWidth = ((float) newWidth) / orgWidth;
+        float scaleHeight = ((float) newHeight) / orgHeight;
+ 
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+        return Bitmap.createBitmap(bitmap, 0, 0, orgWidth, orgHeight, matrix, true);    	
     }
     
-    /**
-     * decode the image from bufferd http entity
-     * to fix skia errors when decoding
-     */    
-    private Bitmap decodeImage(BufferedHttpEntity entity) {
-        try {
-            /*
-             * get the size of the image first
-             */
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(entity.getContent(), null, options);            
-            /*
-             * here calculate the scale for next step to decode
-             * according to the width or height of the image 
-             * is smaller than Constants.REQUIRED_IMAGE_SIZE
-             */
-            int scale = 1;
-            int width = options.outWidth, height = options.outHeight;
-            for (;;) {
-                if (width / 2 < Constants.REQUIRED_IMAGE_SIZE ||
-                		height / 2 < Constants.REQUIRED_IMAGE_SIZE) {
-                    break;
-                }
-                width = width / 2;
-                height = height / 2;
-                scale = scale * 2;
-            }
-            /*
-             * then decode the image according to the scale
-             */
-            BitmapFactory.Options opt = new BitmapFactory.Options();
-            opt.inJustDecodeBounds = false;
-            opt.inSampleSize = scale;
-            return BitmapFactory.decodeStream(entity.getContent(), null, opt);
+    private Bitmap decodeImage(File file, int width, int height) {
+    	Bitmap bitmapOrg = null;
+    	try {
+    		bitmapOrg = BitmapFactory.decodeStream(new FileInputStream(file), 
+        						null, new BitmapFactory.Options());
+        } catch (FileNotFoundException e) {
+        }
+    	return resizeImage(bitmapOrg, width, height);
+    }
+
+    private Bitmap decodeImage(BufferedHttpEntity entity, int width, int height) {
+    	Bitmap bitmapOrg = null;
+    	try {
+    		bitmapOrg = BitmapFactory.decodeStream(entity.getContent(), 
+        						null, new BitmapFactory.Options());
         } catch (FileNotFoundException e) {
         } catch (IOException e) {
         }
-        return null;
+    	return resizeImage(bitmapOrg, width, height);
     }
-    
+        
     /**
      * It's a helper class for BitmapLoader
      */
@@ -274,7 +232,7 @@ public class ImageLoader {
         public String mUrl;
         public ImageView mImageView;
         
-        public BitmapToLoad(String url, ImageView view){
+        public BitmapToLoad(String url, ImageView view) {
             mUrl = url; 
             mImageView = view;
         }
@@ -324,7 +282,7 @@ public class ImageLoader {
      * to determine whether this image has been used by another
      * row item, it caused by reuse the convert view in 'getView'
      */
-    private boolean isImageViewReused(BitmapToLoad bitmapToLoad){
+    private boolean isImageViewReused(BitmapToLoad bitmapToLoad) {
         String tag = mImageViews.get(bitmapToLoad.mImageView);
         
         if (tag == null || !tag.equals(bitmapToLoad.mUrl)) {

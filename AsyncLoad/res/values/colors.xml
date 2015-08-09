@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="title_backround">#0099FF</color>
 	<color name="title_color">#333333</color>
 	<color name="row_title_color">#3399cc</color>
-    <color name="button_background_startcolor">#717a97</color>
-    <color name="button_background_endcolor">#223158</color>
     <color name="row_background_startcolor">#ffffff</color>
     <color name="row_background_endcolor">#EDEDED</color>
     <color name="transparent">#00000000</color>
-    <color name="gray_cccccc">#cccccc</color>
-    <color name="gray_333333">#333333</color>
-    <color name="gray_666666">#666666</color>
-    <color name="gray_start_normal">#859198</color>
-    <color name="gray_end_normal">#68737c</color>    
     <color name="titlebar_background_startcolor">#FF4279D0</color>
     <color name="titlebar_background_endcolor">#FF2265D0</color>
     <color name="titlebar_background_centercolor">#FF0353D2</color>
+    <color name="header_footer_text_color">#FF0000</color>
     
 </resources>

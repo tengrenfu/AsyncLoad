@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
     <RelativeLayout
+        android:id="@+id/title_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/title_layout_height"
         android:background="@drawable/title_bar_background"
@@ -15,29 +16,21 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="@dimen/title_margin_left"
+            android:layout_marginLeft="@dimen/title_margin"
+            android:layout_marginRight="@dimen/title_margin"
+            android:layout_centerHorizontal="true"
             android:ellipsize="marquee"
             android:singleLine="true"
-            android:gravity="center_vertical"
+            android:gravity="center"
+	        android:textSize="@dimen/title_textsize" 
             android:textColor="@color/title_color"
             android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/reload"
-            style="@style/GrayButtonNoCorner"
-            android:layout_width="@dimen/button_layout_width"
-            android:layout_height="@dimen/button_layout_height"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="@dimen/button_margin_top"
-            android:layout_marginRight="@dimen/button_margin_right"
-            android:gravity="center"
-            android:textSize="@dimen/button_textsize"
-            android:text="@string/button_text" />
     </RelativeLayout>
 
-    <ListView
+    <com.displayjson.asyncload.EnhancedListView
         android:id="@+id/list"
+        android:layout_below="@+id/title_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
@@ -48,4 +41,4 @@
         android:cacheColorHint="@color/transparent"
         android:scrollbarStyle="outsideOverlay" />
 
-</LinearLayout>
+</RelativeLayout>

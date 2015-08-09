@@ -12,7 +12,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import android.test.ActivityInstrumentationTestCase2;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -22,7 +21,6 @@ import com.displayjson.asyncload.*;
 public class AsyncLoadActivityTest extends
 		ActivityInstrumentationTestCase2<AsyncLoadActivity> {
 	private AsyncLoadActivity mActivity;
-    private Button mButton;
     private ListView mList;
     private TextView mTitle;
 
@@ -42,7 +40,6 @@ public class AsyncLoadActivityTest extends
 	protected void setUp() throws Exception {
 		super.setUp();
 		mActivity = getActivity();
-		mButton = (Button)mActivity.findViewById(com.displayjson.asyncload.R.id.reload);
 		mList = (ListView)mActivity.findViewById(com.displayjson.asyncload.R.id.list);
 		mTitle = (TextView)mActivity.findViewById(com.displayjson.asyncload.R.id.title);
 	}
@@ -68,7 +65,6 @@ public class AsyncLoadActivityTest extends
 	@Test
 	public void testOnCreateBundle() {
 		assertEquals("", mTitle.getText()); 
-		assertTrue(!mButton.isEnabled());
 	}
 
 }

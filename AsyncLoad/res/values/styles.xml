@@ -16,14 +16,5 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
-
-    <style name="GrayButtonNoCorner">
-        <item name="android:textColor">@color/button_normal_white_font_color</item>
-        <item name="android:background">@drawable/button_gray_rounded_shape_no_corner_selector</item>
-        <item name="android:layout_width">@dimen/button_layout_width</item>
-        <item name="android:layout_height">@dimen/button_style_height</item>
-        <item name="android:textSize">@dimen/button_small_text_size</item>
-        <item name="android:textStyle">bold</item>
-    </style>
     
 </resources>

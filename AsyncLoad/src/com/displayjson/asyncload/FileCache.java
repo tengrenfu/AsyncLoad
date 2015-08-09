@@ -10,10 +10,13 @@ import java.net.URLEncoder;
 import java.io.UnsupportedEncodingException;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.StatFs;
 
 
 public class FileCache {
     private File mCacheDir;
+    private Handler mHandler = new Handler();
     
     public FileCache(Context context) {
     	/*
@@ -37,14 +40,44 @@ public class FileCache {
 	 */
     public File getFile(String url) {
     	String file_name;
+    	
+    	checkLimit();
     	try {
     		file_name = URLEncoder.encode(url, Constants.ENCODE_CHARSET);
     	} catch (UnsupportedEncodingException e) {
     		file_name = String.valueOf(url.hashCode());    		
     	}
         File file = new File(mCacheDir, file_name);
-        return file;
-        
+        return file;        
+    }
+    
+    private void checkLimit() {
+        mHandler.postDelayed(new Runnable() {
+            @Override  
+            public void run() {
+            	StatFs stat = new StatFs(mCacheDir.getPath());
+            	for (;;) {
+                	long total = stat.getBlockCount();
+                	long free = stat.getFreeBlocks();
+                	float percent  = (float)free / (float)total;
+                	if (percent < Constants.MAX_DISK_UNUSED_PERCENT) {
+                		File[] files = mCacheDir.listFiles();
+                		if (files.length <= 0) {
+                			break;
+                		}
+                		File del = files[0];
+                		for (File f:files) {
+                			if (f.lastModified() < del.lastModified()) {
+                				del = f;
+                			}
+                		}
+                		del.delete();
+                	} else {
+                		break;
+                	}
+            	}
+            }  
+        }, Constants.DELAY);
     }
     
 	/**
