@@ -13,9 +13,9 @@
     <dimen name="imageview_layout_margin">10dp</dimen>
     <dimen name="titlebar_background_padding">0dp</dimen>
     <dimen name="header_footer_textsize">18sp</dimen>
-    <dimen name="header_frame_margin_left">50dp</dimen>
+    <dimen name="header_frame_margin_left">40dp</dimen>
     <dimen name="header_frame_margin_top_bottom">15dp</dimen>
-    <dimen name="header_image_minwidth">30dp</dimen>
+    <dimen name="header_image_minwidth">25dp</dimen>
     
     
 </resources>

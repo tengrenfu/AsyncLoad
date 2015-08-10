@@ -156,7 +156,8 @@ public class ImageLoader {
     	 * get image from file cache first
     	 */
         File file = mFileCache.getFile(url);
-        Bitmap iamge = decodeImage(file, 160, 120);
+        Bitmap iamge = decodeImage(file, Constants.REQUIRED_IMAGE_WIDTH, 
+        									Constants.REQUIRED_IMAGE_HEIGHT);
         if (iamge != null) {
             return iamge;
         }        
@@ -187,6 +188,13 @@ public class ImageLoader {
         return null;
     }
 
+    /**
+     * decode the image with input size
+     * @param bitmap  the image to be resized
+     * @param width   new width for the image
+     * @param height  new height for the image
+     * @return  new size image
+     */
     private Bitmap resizeImage(Bitmap bitmap, int width, int height) {
     	if (bitmap == null || width <=0 || height <= 0) {
     		return null;

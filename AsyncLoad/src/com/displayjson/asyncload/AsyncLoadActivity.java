@@ -30,12 +30,14 @@ public class AsyncLoadActivity extends Activity implements OnRefreshListener {
     private TextView mTitle;
     private SimpleAdapter mAdapter;
     private JsonBody mJsonBody;
+    private long mLastModified;
     private Handler mHandler = new Handler();
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_async_load);
+		mLastModified = 0;
 		
 		initView();
 		/* 
@@ -151,9 +153,6 @@ public class AsyncLoadActivity extends Activity implements OnRefreshListener {
 	 * get json data with http request from server
 	 * then parse the response stream with gson
 	 * and store the objects into JsonBody
-	 * TODO: I'd request the json with range request, 
-	 * that is I'd set 'Range' in every HTTP request header
-	 * it's necessary when the response is large
 	 */ 
     private JsonBody getJsonFromUrl(String urlStr) {
         try {
@@ -163,9 +162,11 @@ public class AsyncLoadActivity extends Activity implements OnRefreshListener {
             conn.setConnectTimeout(Constants.JSON_CONNECT_TIMEOUT);
             conn.setReadTimeout(Constants.JSON_READ_TIME);
             conn.setInstanceFollowRedirects(true);
+          	conn.setIfModifiedSince(mLastModified);
  
             int response_code = conn.getResponseCode();
             if (response_code == Constants.HTTP_RESPONSE_OK) {
+            	mLastModified = conn.getLastModified();
                 InputStream is = conn.getInputStream();
                 InputStreamReader streamReader = new InputStreamReader(is);
                 BufferedReader bufferReader = new BufferedReader(streamReader);
@@ -176,7 +177,12 @@ public class AsyncLoadActivity extends Activity implements OnRefreshListener {
                 }
                 Gson gson = new Gson();
                 return gson.fromJson(JsonStr, JsonBody.class);
+            } else if (response_code == Constants.HTTP_RESPONSE_NOCHANG) {
+                conn.disconnect();
+                return null;
             } else {
+                Toast.makeText(AsyncLoadActivity.this, Constants.TOAST_TEXT,
+						Toast.LENGTH_SHORT).show();
                 conn.disconnect();
                 return null;
             }
@@ -235,18 +241,21 @@ public class AsyncLoadActivity extends Activity implements OnRefreshListener {
 				mAdapter.notifyDataSetChanged();
 				mListView.hideHeaderView();
 				mListView.setAllLoaded(false);
-            } else {
-                Toast.makeText(AsyncLoadActivity.this, Constants.TOAST_TEXT,
-						Toast.LENGTH_SHORT).show();
-	        }
+            }
         }
     }
 
+    /**
+     * pull down the list view to request the URL
+     */
     @Override  
     public void onDownPullRefresh() {
     	new requestTask().execute();
     }
     
+    /**
+     * load more when pulling up the list view at the bottom
+     */
     @Override  
     public void onLoadingMore() {
     	loadMore();

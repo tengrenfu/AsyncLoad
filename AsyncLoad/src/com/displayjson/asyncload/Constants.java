@@ -27,14 +27,17 @@ public final class Constants {
 	public static final int  JSON_CONNECT_TIMEOUT = 3000;
 	public static final int  JSON_READ_TIME = 3000;
 	public static final int  HTTP_RESPONSE_OK = 200;    //do NOT change this value
+	public static final int  HTTP_RESPONSE_NOCHANG = 304;    //do NOT change this value
 	public static final int  THREAD_POOL_SIZE = 5;
 	public static final int  IMAGE_CONNECT_TIMEOUT = 30000;
 	public static final int  IMAGE_READ_TIME = 30000;
 	public static final int  BUFFER_SIZE = 1024;    // 2^n is better
 	public static final int  REQUIRED_IMAGE_SIZE = 80;
+	public static final int  REQUIRED_IMAGE_WIDTH = 160;
+	public static final int  REQUIRED_IMAGE_HEIGHT = 120;
 	public static final int  MAX_MEMORY_CACHE_SIZE = 1048576;
 	public static final int  JVM_MEMORY_DIV = 4;
 	public static final int  MAX_Y_OVERSCROLL_DISTANCE = 50;
-	public static final float  MAX_DISK_UNUSED_PERCENT = 0.15f;
+	public static final float  MAX_DISK_UNUSED_PERCENT = 0.08f;
 	
 }

@@ -65,6 +65,9 @@ public class EnhancedListView extends ListView implements OnScrollListener {
 		setOnScrollListener(this);
 	}
 
+	/**
+	 * calculate mMaxYOverScrollDistance
+	 */
 	private void initEnhanvedListView() {
 		DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
 		mMaxYOverScrollDistance = (int)(metrics.density * Constants.MAX_Y_OVERSCROLL_DISTANCE);
@@ -90,6 +93,9 @@ public class EnhancedListView extends ListView implements OnScrollListener {
         addFooterView(mFooterView);
     }
 
+    /**
+     * animate the icon on the header view
+     */
     private void initAnimation() {  
         mUpAnimation = new RotateAnimation(0f, -180f,
                 Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);  
@@ -102,6 +108,10 @@ public class EnhancedListView extends ListView implements OnScrollListener {
         mDownAnimation.setFillAfter(true);  
     }
 
+    /**
+     * handle the header view with the three process
+     * 'pull down to refresh', 'Release to update', 'updating' 
+     */
     @Override  
     public boolean onTouchEvent(MotionEvent event) {    	
         switch (event.getAction()) {        
@@ -171,6 +181,10 @@ public class EnhancedListView extends ListView implements OnScrollListener {
         }
     }
     
+    /**
+     * set json data is loaded or not
+     * @param over  json data is loaded over or not
+     */
     public void setAllLoaded(boolean over) {
     	mIsAllLoaded = over;
     }
@@ -186,6 +200,10 @@ public class EnhancedListView extends ListView implements OnScrollListener {
         }
 	}  
 
+	/**
+	 * if the scroll bar is at the bottom and isn't on loading
+	 * and json data is not loaded, display the footer view
+	 */
 	@Override  
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
         if (scrollState == SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_FLING) {
@@ -204,6 +222,10 @@ public class EnhancedListView extends ListView implements OnScrollListener {
         mOnRefershListener = listener;  
     }  
   
+    /**
+     * hide the header view when new request are sent
+     * it's called after 'onDownPullRefresh' 
+     */
     public void hideHeaderView() {  
         mHeaderView.setPadding(0, -mHeaderViewHeight, 0, 0);
         mImageViewArrow.setVisibility(View.VISIBLE);
@@ -212,11 +234,20 @@ public class EnhancedListView extends ListView implements OnScrollListener {
         mCurrentState = PULL_DOWN_UPDATE;
     }  
   
+    /**
+     * hide the footer view when the new contents have been loaded
+     * it's called in 'onLoadingMore'
+     */
     public void hideFooterView() {
         mFooterView.setPadding(0, -mFooterViewHeight, 0, 0);
         mIsLoadingMore = false;
     }  
 
+    /**
+     * override this method to implement the scroll bar
+     * with damping effect, using mMaxYOverScrollDistance
+     * to replace maxOverScrollY
+     */
 	@Override  
     protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, 
     		int scrollY, int scrollRangeX, int scrollRangeY, 
