@@ -5,12 +5,10 @@
     android:orientation="horizontal" >
 
     <FrameLayout  
-        android:layout_width="wrap_content"  
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginLeft="@dimen/header_frame_margin_left"
-        android:layout_marginBottom="@dimen/header_frame_margin_top_bottom"
-        android:layout_marginTop="@dimen/header_frame_margin_top_bottom" 
         > 
   
         <ImageView  
@@ -35,7 +33,6 @@
         android:layout_gravity="center_vertical"  
         android:gravity="center"
         android:orientation="vertical"  
-        android:textColor="@color/header_footer_text_color"
         android:textSize="@dimen/header_footer_textsize" />  
 
 </LinearLayout>

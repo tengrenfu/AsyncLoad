@@ -25,7 +25,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 
-public class AsyncLoadActivity extends Activity implements OnRefreshListener {
+public class AsyncLoadActivity extends Activity implements OnUpdateListener {
     private EnhancedListView mListView;
     private TextView mTitle;
     private SimpleAdapter mAdapter;
@@ -249,7 +249,7 @@ public class AsyncLoadActivity extends Activity implements OnRefreshListener {
      * pull down the list view to request the URL
      */
     @Override  
-    public void onDownPullRefresh() {
+    public void onPullToUpdate() {
     	new requestTask().execute();
     }
     

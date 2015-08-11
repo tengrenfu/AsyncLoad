@@ -1,3 +1,7 @@
+/* 
+ * Created by Cory Teng  email:tengrenfu@163.com
+ * Aug 8, 2015 
+ */  
 package com.displayjson.asyncload;
 
 import android.content.Context;
@@ -35,7 +39,7 @@ public class EnhancedListView extends ListView implements OnScrollListener {
     private int mFooterViewHeight;  
     private boolean mIsLoadingMore;
     private boolean mIsAllLoaded;
-    private OnRefreshListener mOnRefershListener;  
+    private OnUpdateListener mOnUpdateListener;  
     
     
 	public EnhancedListView(Context context) {
@@ -73,6 +77,9 @@ public class EnhancedListView extends ListView implements OnScrollListener {
 		mMaxYOverScrollDistance = (int)(metrics.density * Constants.MAX_Y_OVERSCROLL_DISTANCE);
 	}
 
+	/**
+	 * initialize the header view and add on the list view
+	 */
     private void initHeaderView() {  
         mHeaderView = View.inflate(getContext(), R.layout.header_view, null);
         mImageViewArrow = (ImageView)mHeaderView.findViewById(R.id.listview_header_arrow);
@@ -85,6 +92,9 @@ public class EnhancedListView extends ListView implements OnScrollListener {
         initAnimation();
     }
     
+    /**
+     * initialize the footer view and add on the list view
+     */ 
     private void initFooterView() {
         mFooterView = View.inflate(getContext(), R.layout.footer_view, null);
         mFooterView.measure(0, 0);
@@ -143,8 +153,8 @@ public class EnhancedListView extends ListView implements OnScrollListener {
                     mHeaderView.setPadding(0, 0, 0, 0);
                     mCurrentState = UPDATING;
                     updateHeaderView();
-                    if (mOnRefershListener != null) {
-                        mOnRefershListener.onDownPullRefresh();
+                    if (mOnUpdateListener != null) {
+                    	mOnUpdateListener.onPullToUpdate();
                     }
                 } else if (mCurrentState == PULL_DOWN_UPDATE) {
                     mHeaderView.setPadding(0, -mHeaderViewHeight, 0, 0);
@@ -189,6 +199,9 @@ public class EnhancedListView extends ListView implements OnScrollListener {
     	mIsAllLoaded = over;
     }
     
+    /**
+     * scroll to the bottom of the list view or not
+     */
 	@Override  
 	public void onScroll(AbsListView view, int firstVisibleItem, 
 			                      int visibleItemCount, int totalItemCount) {
@@ -211,15 +224,15 @@ public class EnhancedListView extends ListView implements OnScrollListener {
                 mIsLoadingMore = true;
                 mFooterView.setPadding(0, 0, 0, 0);
                 setSelection(getCount());
-                if (mOnRefershListener != null) {
-                    mOnRefershListener.onLoadingMore();
+                if (mOnUpdateListener != null) {
+                    mOnUpdateListener.onLoadingMore();
                 }
             }
         }
 	}
 
-    public void setOnRefreshListener(OnRefreshListener listener) {  
-        mOnRefershListener = listener;  
+    public void setOnRefreshListener(OnUpdateListener listener) {  
+        mOnUpdateListener = listener;  
     }  
   
     /**

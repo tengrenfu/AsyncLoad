@@ -178,7 +178,8 @@ public class ImageLoader {
             copyStream(src, dst);
             dst.close();
             
-            bitmap = decodeImage(bufferedEntity, 160, 120);
+            bitmap = decodeImage(bufferedEntity, Constants.REQUIRED_IMAGE_WIDTH, 
+													Constants.REQUIRED_IMAGE_HEIGHT);
             return bitmap;
         } catch (Throwable e) {
            if (e instanceof OutOfMemoryError) {

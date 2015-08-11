@@ -24,8 +24,7 @@ public class ImageMemoryCache {
     	if (size > maxSize) {
     		setMaxSize(size);
     	}
-        mCache = Collections.synchronizedMap(
-                new LinkedHashMap<String, Bitmap>(10, 1.5f, true));
+        mCache = Collections.synchronizedMap(new LinkedHashMap<String, Bitmap>(10, 1.5f, true));
     }
     
     private void setMaxSize(long max) {
