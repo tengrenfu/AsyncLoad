@@ -181,15 +181,19 @@ public class AsyncLoadActivity extends Activity implements OnUpdateListener {
                 conn.disconnect();
                 return null;
             } else {
-                Toast.makeText(AsyncLoadActivity.this, Constants.TOAST_TEXT,
-						Toast.LENGTH_SHORT).show();
+                Toast.makeText(AsyncLoadActivity.this, Constants.TOAST_TEXT, Toast.LENGTH_SHORT).show();
                 conn.disconnect();
                 return null;
             }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+//          e.printStackTrace();
+            /* it's  workaround for disconnecting this json server in china, begin */
+        	String jsonResponse = "{\"title\":\"About Canada\",\"rows\":[{\"title\":\"Beavers\",\"description\":\"Beavers are second only to humans in their ability to manipulate and change their environment. They can measure up to 1.3 metres long. A group of beavers is called a colony\",\"imageHref\":\"http://sucai.qqjay.com/fengmian/201104/tupian1/11.jpg\"},{\"title\":\"Flag\",\"description\":null,\"imageHref\":\"http://sucai.qqjay.com/fengmian/201104/tupian1/12.jpg\"},{\"title\":\"Transportation\",\"description\":\"It is a well known fact that polar bears are the main mode of transportation in Canada. They consume far less gas and have the added benefit of being difficult to steal.\",\"imageHref\":\"http://sucai.qqjay.com/fengmian/201104/tupian1/10.jpg\"},{\"title\":\"Hockey Night in Canada\",\"description\":\"These Saturday night CBC broadcasts originally aired on radio in 1931. In 1952 they debuted on television and continue to unite (and divide) the nation each week.\",\"imageHref\":\"http://sucai.qqjay.com/fengmian/201104/tupian1/9.jpg\"},{\"title\":\"Eh\",\"description\":\"A chiefly Canadian interrogative utterance, usually expressing surprise or doubt or seeking confirmation.\",\"imageHref\":null},{\"title\":\"Housing\",\"description\":\"Warmer than you might think.\",\"imageHref\":\"http://sucai.qqjay.com/fengmian/201104/tupian1/8.jpg\"},{\"title\":\"Public Shame\",\"description\":\" Sadly it's true.\",\"imageHref\":\"http://sucai.qqjay.com/fengmian/201104/tupian1/7.jpg\"},{\"title\":null,\"description\":null,\"imageHref\":null},{\"title\":\"Space Program\",\"description\":\"Canada hopes to soon launch a man to the moon.\",\"imageHref\":\"http://sucai.qqjay.com/fengmian/201104/tupian1/6.jpg\"},{\"title\":\"Meese\",\"description\":\"A moose is a common sight in Canada. Tall and majestic, they represent many of the values which Canadians imagine that they possess. They grow up to 2.7 metres long and can weigh over 700 kg. They swim at 10 km/h. Moose antlers weigh roughly 20 kg. The plural of moose is actually 'meese', despite what most dictionaries, encyclopedias, and experts will tell you.\",\"imageHref\":\"http://sucai.qqjay.com/fengmian/201104/tupian1/5.jpg\"},{\"title\":\"Geography\",\"description\":\"It's really big.\",\"imageHref\":null},{\"title\":\"Kittens...\",\"description\":\"?are illegal. Cats are fine.\",\"imageHref\":\"http://sucai.qqjay.com/fengmian/201104/tupian1/4.jpg\"},{\"title\":\"Mounties\",\"description\":\"They are the law. They are also Canada's foreign espionage service. Subtle.\",\"imageHref\":\"http://sucai.qqjay.com/fengmian/201104/tupian1/3.jpg\"},{\"title\":\"Language\",\"description\":\"Nous parlons tous les langues importants.\",\"imageHref\":null}]}";
+            Gson gson = new Gson();
+            return gson.fromJson(jsonResponse, JsonBody.class);
+            /* it's  workaround for disconnecting this json server in china, end */
         }
         return null;
     }
