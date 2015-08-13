@@ -26,7 +26,7 @@ public class SimpleAdapter extends BaseAdapter {
     	mList = list;
     	mActivity = activity;
     	mInflater = (LayoutInflater)mActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    	mImageLoader = new ImageLoader(mActivity.getApplicationContext());
+    	mImageLoader = new ImageLoader(mActivity.getApplicationContext(), mActivity);
     }
     
 	/**

@@ -30,17 +30,20 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.util.DisplayMetrics;
 import android.widget.ImageView;
 
 
 public class ImageLoader {
+	private Activity mActivity;
     private ImageMemoryCache mMemoryCache;
     private FileCache mFileCache;
     private Map<ImageView, String> mImageViews;
     private Map<String, BitmapLoader> mThreads;
     private ExecutorService executorService; 
     
-    public ImageLoader(Context context) {
+    public ImageLoader(Context context, Activity activity) {
+    	mActivity = activity;
     	mImageViews = Collections.synchronizedMap(new WeakHashMap<ImageView, String>());
     	mThreads = new HashMap<String, BitmapLoader>();
     	mMemoryCache = new ImageMemoryCache();
@@ -146,7 +149,7 @@ public class ImageLoader {
         } catch(Exception e) {
         }
     }
-    
+        
     /**
      * get image from file system or from web site
      * then decode the image
@@ -155,9 +158,13 @@ public class ImageLoader {
     	/*
     	 * get image from file cache first
     	 */
+    	int width = getImageWidth();
+    	if (width < Constants.REQUIRED_IMAGE_SIZE) {
+    		width = Constants.REQUIRED_IMAGE_WIDTH;
+    	}
+    	int height = (width >> 2) * 3;
         File file = mFileCache.getFile(url);
-        Bitmap iamge = decodeImage(file, Constants.REQUIRED_IMAGE_WIDTH, 
-        									Constants.REQUIRED_IMAGE_HEIGHT);
+        Bitmap iamge = decodeImage(file, width, height);
         if (iamge != null) {
             return iamge;
         }        
@@ -178,8 +185,7 @@ public class ImageLoader {
             copyStream(src, dst);
             dst.close();
             
-            bitmap = decodeImage(bufferedEntity, Constants.REQUIRED_IMAGE_WIDTH, 
-													Constants.REQUIRED_IMAGE_HEIGHT);
+            bitmap = decodeImage(bufferedEntity, width, height);
             return bitmap;
         } catch (Throwable e) {
            if (e instanceof OutOfMemoryError) {
@@ -233,7 +239,16 @@ public class ImageLoader {
         }
     	return resizeImage(bitmapOrg, width, height);
     }
-        
+    
+    /**
+     *  return screen pixel width / 4 as image width
+     */
+    private int getImageWidth() {
+    	DisplayMetrics dm = new DisplayMetrics();
+    	mActivity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+    	return dm.widthPixels >> 2;
+    }
+    
     /**
      * It's a helper class for BitmapLoader
      */

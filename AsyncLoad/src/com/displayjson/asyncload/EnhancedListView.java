@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;  
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class EnhancedListView extends ListView implements OnScrollListener {
@@ -30,7 +29,6 @@ public class EnhancedListView extends ListView implements OnScrollListener {
     private Animation mUpAnimation;
     private Animation mDownAnimation;
     private ImageView mImageViewArrow;  
-    private ProgressBar mProgressBar; 
     private TextView mTextViewState;  
     private boolean mIsScrollToBottom;  
     private int mHeaderViewHeight;  
@@ -83,7 +81,6 @@ public class EnhancedListView extends ListView implements OnScrollListener {
     private void initHeaderView() {  
         mHeaderView = View.inflate(getContext(), R.layout.header_view, null);
         mImageViewArrow = (ImageView)mHeaderView.findViewById(R.id.listview_header_arrow);
-        mProgressBar = (ProgressBar)mHeaderView.findViewById(R.id.listview_header_progressbar);
         mTextViewState = (TextView)mHeaderView.findViewById(R.id.listview_header_state);  
         mHeaderView.measure(0, 0);
         mHeaderViewHeight = mHeaderView.getMeasuredHeight();
@@ -182,7 +179,6 @@ public class EnhancedListView extends ListView implements OnScrollListener {
             case UPDATING:
                 mImageViewArrow.clearAnimation();
                 mImageViewArrow.setVisibility(View.GONE);
-                mProgressBar.setVisibility(View.VISIBLE);
                 mTextViewState.setText("Updating...");
                 break;
                 
@@ -242,7 +238,6 @@ public class EnhancedListView extends ListView implements OnScrollListener {
     public void hideHeaderView() {  
         mHeaderView.setPadding(0, -mHeaderViewHeight, 0, 0);
         mImageViewArrow.setVisibility(View.VISIBLE);
-        mProgressBar.setVisibility(View.GONE);
         mTextViewState.setText("Pull to refresh...");
         mCurrentState = PULL_DOWN_UPDATE;
     }  

@@ -32,20 +32,20 @@ public class ImageLoaderTest extends AndroidTestCase {
 
 	@Test
 	public void testImageLoader() throws Throwable {
-		ImageLoader loader = new ImageLoader(getContext());
+		ImageLoader loader = new ImageLoader(getContext(), null);
 		assertTrue(loader != null);
 	}
 
 	@Test
 	public void testDisplayImageOnView() throws Throwable {
-		ImageLoader loader = new ImageLoader(getContext());
+		ImageLoader loader = new ImageLoader(getContext(), null);
 		loader.displayImageOnView(null, null);
 		loader.displayImageOnView("", null);
 	}
 
 	@Test
 	public void testClearCache() throws Throwable {
-		ImageLoader loader = new ImageLoader(getContext());
+		ImageLoader loader = new ImageLoader(getContext(), null);
 		loader.clearCache();
 	}
 

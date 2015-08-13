@@ -33,8 +33,7 @@ public final class Constants {
 	public static final int  IMAGE_READ_TIME = 30000;
 	public static final int  BUFFER_SIZE = 1024;    // 2^n is better
 	public static final int  REQUIRED_IMAGE_SIZE = 80;
-	public static final int  REQUIRED_IMAGE_WIDTH = 200;
-	public static final int  REQUIRED_IMAGE_HEIGHT = 150;
+	public static final int  REQUIRED_IMAGE_WIDTH = 180;
 	public static final int  MAX_MEMORY_CACHE_SIZE = 1048576;
 	public static final int  JVM_MEMORY_DIV = 4;
 	public static final int  MAX_Y_OVERSCROLL_DISTANCE = 50;
